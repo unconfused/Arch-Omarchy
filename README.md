@@ -3,23 +3,19 @@
 This is my current setup for a minimalist feeling, but very functional Linux setup. Also, note that this is primarily a single user setup.
 
 ### Omarchy = an opinionated Arch + Hyprland setup
-Watch the videos...and get some background as to why this is a good choice compared to just an Arch install, or picking a bigger install based on Arch like CachyOS.
-```
-https://omarchy.org/
-```
+Watch the videos...and get some background as to why this is a good choice compared to just an Arch install, or picking a bigger install based on Arch like CachyOS.<br>
+[https://omarchy.org/](https://omarchy.org/)
 
 
 ### OS / Windows Manager / System Setup
 
-Download Arch Linux:
-```
-https://archlinux.org/
-```
+Download Arch Linux:<br>
+[https://archlinux.org/](https://archlinux.org/)
 
-Configure your install with these instructions:
-```
-https://manuals.omamix.org/2/the-omarchy-manual/50/getting-started
-```
+
+Configure your install with these instructions:<br>
+[https://manuals.omamix.org/2/the-omarchy-manual/50/getting-started](https://manuals.omamix.org/2/the-omarchy-manual/50/getting-started)
+
 Pay special attention on a few of the parts...as they aren't very clear. Also, you might think you don't want the disk encryption, but it is important to the setup (and really disk encryption is important for you and your data). The Omarchy setup will essentially use disk encryption pass as your only login.  As with anything, there is always a way to enable shell logins again, and not use encryption.
 
 Under "Partitioning":
@@ -64,7 +60,7 @@ You can use the mouse and click the circle in the upper-left of the screen. Or y
 2. Super-Alt-Space to bring up the system menu.
 3. Super-1, Super-2, Super-3, etc. to switch to a specific desktop.
 4. Super-W to close an application.
-5. Super-[mouse drag] to move an application to a new postion.
+5. Super-\[mouse drag\] to move an application to a new postion.
 6. If you have a app on, say, desktop 3....and you want it to be on desktop 2...hit Super-Shift-2 and it will jump to that desktop.
 7. Anytime you are lost and want to see the hotkeys...hit Super-K
 
@@ -75,13 +71,17 @@ First we need to test if the resolution and scaling you see on the screen is wor
 
 Let us prep the Neovim editor, and then edit the files. Open an Alacritty terminal. Then type 'nvim' to start Neovim.  It will download all it's plugins and configure itself. Once it is done...hit 'q' to close the update window....and then 'q' again to close Neovim.
 
-Type 'nvim ~/.config/hypr/monitors.conf'.  Currently it has the following in it:
-  env = GDK_SCALE,2
-  monitor=,preferred,auto,auto
+Type ```nvim ~/.config/hypr/monitors.conf```.  Currently it has the following in it:
+```
+env = GDK_SCALE,2
+monitor=,preferred,auto,auto
+```
 
 For a 1080p screen @ 60Hz, which scaling at 1:1, make some changes. So, to actually insert/edit the text, press 'i'. Change those lines to:
-  env = GDK_SCALE,1
-  monitor=,preferred,1920x1024@60,1
+```
+env = GDK_SCALE,1
+monitor=,preferred,1920x1024@60,1
+```
 
 To save it, press ':' to give nvim a command, type 'wq' for write and quit, hit enter.  If you need to quit and discard changes, hit ':' and then 'q!', enter.
 
@@ -96,9 +96,55 @@ List of apps I add:
 1. ghostty - I think this is better than Alacritty
 2. firefox - Chromium is already installed...but I like firefox.
 3. libreoffice-fresh - everyone needs an office suite
-4. enpass-bin - This enpass is in the AUR, so you have to use ```sudo yay -S enpass-bin``` to install it.
+4. gimp - full-featured image editor
+5. enpass-bin - This enpass is in the AUR, so you have to use ```sudo yay -S enpass-bin``` to install it.
+6. python3 - Super-Alt-Space, Install, Development, Python
+7. rust - Super-Alt-Space, Install, Development, Rust
+8. Visual Studio Code - Super-Alt-Space, Install, Editor, VSCode
+9. hdparm - controls for HDDs
 
 
 ### Post-Install Items
 
-1. 
+On my old laptop there is a spinning-disc HDD.  I had an issue with it running constantly and never suspending.  I had to do the following:
+(/dev/sda is my HDD, /dev/nvme0n1 is my nvme)
+Allow suspending...
+```
+sudo hdparm --yes-i-know-what-i-am-doing -s 1 /dev/sda
+```
+Set suspending the HDD to 5 minutes.  The number in the hdparm command is a calculation of 5-second intervals. [minutes]*60/5.  So, 5-minutes is 5*60/5=60. 10-minutes would be 10*60/5=120.
+```
+sudo hdparm -s 60 /dev/sda
+```
+
+Enable the uncomplicated firewall:
+```
+sudo systemctl enable --now ufw.service
+```
+
+Add Oh-My-Posh to pretty up the terminal prompt:<br>
+[https://ohmyposh.dev/docs/installation/linux](https://ohmyposh.dev/docs/installation/linux)
+
+
+
+### Other stuff
+
+I set up a key for ssh...
+```
+ssh-keygen -t ecdsa -b 521
+```
+You can name it whatever or leave it default.
+I don't put a password on it.
+Enable the ssh-agent...
+```
+eval $(ssh-agent -s)
+```
+Then add it to your keychain...
+```
+ssh-add ~/.ssh/id_ecdsa
+```
+This way you have an authentication key ready to go for GitHub. View the public key...
+```
+cat ~/.ssh/id_ecdsa.pub
+```
+
