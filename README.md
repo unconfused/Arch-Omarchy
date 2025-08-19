@@ -83,7 +83,7 @@ env = GDK_SCALE,1
 monitor=,preferred,1920x1024@60,1
 ```
 
-To save it, press ':' to give nvim a command, type 'wq' for write and quit, hit enter.  If you need to quit and discard changes, hit ':' and then 'q!', enter.
+To save it, hit escape to get out of insert mode, press ':' to give nvim a command, type 'wq' for write and quit, hit enter.  If you need to quit and discard changes, hit ':' and then 'q!', enter.
 
 If something still is off, you can reedit that and play with the settings. There are other examples in the file.
 
@@ -124,7 +124,22 @@ sudo systemctl enable --now ufw.service
 
 Add Oh-My-Posh to pretty up the terminal prompt:<br>
 [https://ohmyposh.dev/docs/installation/linux](https://ohmyposh.dev/docs/installation/linux)
-
+Install oh-my-posh...
+```
+curl -s https://ohmyposh.dev/install.sh | bash -s
+```
+Edit the .bashrc file 
+```
+nvim .bashrc
+```
+Hit 'i' to insert. Add this line at the very end of the file...I'm using the 'catppuccin' theme.
+```
+eval "$(oh-my-posh init bash --config /home/evan/.cache/oh-my-posh/themes/catppuccin.omp.json)"
+```
+Hit escape, ':' for a command, then 'wq' to write/quit. Then refresh bash...
+```
+source .bashrc
+```
 
 
 ### Other stuff
