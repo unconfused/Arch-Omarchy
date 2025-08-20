@@ -108,13 +108,23 @@ List of apps I add:
 
 On my old laptop there is a spinning-disc HDD.  I had an issue with it running constantly and never suspending.  I had to do the following:
 (/dev/sda is my HDD, /dev/nvme0n1 is my nvme)
-Allow suspending...
+Allow suspending...Set suspending the HDD to 5 minutes.  The number in the hdparm command is a calculation of 5-second intervals. [minutes]*60/5.  So, 5-minutes is 5*60/5=60. 10-minutes would be 10*60/5=120.
 ```
+# this part is just temporary though...
 sudo hdparm --yes-i-know-what-i-am-doing -s 1 /dev/sda
-```
-Set suspending the HDD to 5 minutes.  The number in the hdparm command is a calculation of 5-second intervals. [minutes]*60/5.  So, 5-minutes is 5*60/5=60. 10-minutes would be 10*60/5=120.
-```
 sudo hdparm -S 60 /dev/sda
+
+# this is the permanent fix...
+sudo udevadm info -q all -n /dev/sda | grep ID_SERIAL
+sudo nvim /etc/udev/rules.d/99-spindown.rules
+
+# Add the following line in your new .rules file...change my serial number for yours.
+ACTION=="add|change", SUBSYSTEM=="block", ENV{ID_SERIAL}=="WDC_WD10JPVX-22JC3T0_WD-WX61C54F1234", RUN+="/usr/bin/hdparm -S 36 /dev/%k"
+
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+sudo hdparm -C /dev/sda
 ```
 
 Enable the uncomplicated firewall:
