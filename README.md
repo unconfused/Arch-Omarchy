@@ -144,22 +144,20 @@ source .bashrc
 
 ### Other stuff
 
-I set up a key for ssh...
+Set up for .dotfiles usage...
 ```
+cd ~
 ssh-keygen -t ecdsa -b 521
-```
-You can name it whatever or leave it default.
-I don't put a password on it.
-Enable the ssh-agent...
-```
 eval $(ssh-agent -s)
-```
-Then add it to your keychain...
-```
 ssh-add ~/.ssh/id_ecdsa
-```
-This way you have an authentication key ready to go for GitHub. View the public key...
-```
 cat ~/.ssh/id_ecdsa.pub
+# add this to your Github > profile > setttings > SSH and GPG keys > new SSH key
+
+mkdir ~/.dotfiles
+cd ~/.dotfiles
+git init
+git remote add origin git@github.com:unconfused/dotfiles.git
+git pull origin master
 ```
+
 
