@@ -114,7 +114,7 @@ sudo hdparm --yes-i-know-what-i-am-doing -s 1 /dev/sda
 ```
 Set suspending the HDD to 5 minutes.  The number in the hdparm command is a calculation of 5-second intervals. [minutes]*60/5.  So, 5-minutes is 5*60/5=60. 10-minutes would be 10*60/5=120.
 ```
-sudo hdparm -s 60 /dev/sda
+sudo hdparm -S 60 /dev/sda
 ```
 
 Enable the uncomplicated firewall:
