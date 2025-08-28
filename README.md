@@ -104,6 +104,7 @@ List of apps I add:
 9. hdparm - controls for HDDs
 10. fd - a better find
 11. ripgrep (rg) - a better grep
+12. jq - json query tool
 
 
 ### HDD spin-down rules
@@ -177,7 +178,7 @@ Start the service:
 sudo systemctl enable --now hdd-spin-down-on-wake.service
 ```
 
-### Fix USB mouse on wake
+### Fix USB mouse on wake -- this one isn't working quite as expected
 
 Install tools for 'lsusb' and then find your USB mouse:
 ```
