@@ -102,6 +102,8 @@ List of apps I add:
 7. rust - Super-Alt-Space, Install, Development, Rust
 8. Visual Studio Code - Super-Alt-Space, Install, Editor, VSCode
 9. hdparm - controls for HDDs
+10. fd - a better find
+11. ripgrep (rg) - a better grep
 
 
 ### HDD spin-down rules
@@ -175,17 +177,37 @@ Start the service:
 sudo systemctl enable --now hdd-spin-down-on-wake.service
 ```
 
+### Fix USB mouse on wake
+Create this service:
+```
+sudo nvim /etc/systemd/system/reset-mouse.service
+```
+Put this in the file:
+```
+[Unit]
+Description=Reset USB Mouse on Wake
+After=suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo "1-1" | sudo tee /sys/bus/usb/drivers/usb/unbind; echo "1-1" | sudo tee /sys/bus/usb/drivers/usb/bind'
+
+[Install]
+WantedBy=suspend.target
+
+```
+Start the service:
+```
+sudo systemctl enable --now reset-mouse.service
+```
+
+
 
 ### Post-Install Items
 
 Enable the uncomplicated firewall:
 ```
 sudo systemctl enable --now ufw.service
-```
-
-Install 'fd' (better find) and ripgrep 'rg' (better grep):
-```
-sudo pacman -S fd ripgrep
 ```
 
 
