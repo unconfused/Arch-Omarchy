@@ -178,6 +178,15 @@ sudo systemctl enable --now hdd-spin-down-on-wake.service
 ```
 
 ### Fix USB mouse on wake
+
+Install tools for 'lsusb' and then find your USB mouse:
+```
+sudo pacman -S usbutils
+sudo lsusb
+```
+Mine was this one:
+Bus 001 Device 007: ID 045e:07b2 Microsoft Corp. 2.4GHz Transceiver v8.0 used by mouse Wireless Desktop 900
+
 Create this service:
 ```
 sudo nvim /etc/systemd/system/reset-mouse.service
@@ -190,7 +199,7 @@ After=suspend.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c 'echo "1-1" | sudo tee /sys/bus/usb/drivers/usb/unbind; echo "1-1" | sudo tee /sys/bus/usb/drivers/usb/bind'
+ExecStart=/bin/sh -c 'echo "1-7" | sudo tee /sys/bus/usb/drivers/usb/unbind; echo "1-7" | sudo tee /sys/bus/usb/drivers/usb/bind'
 
 [Install]
 WantedBy=suspend.target
