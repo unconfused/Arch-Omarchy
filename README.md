@@ -104,52 +104,111 @@ List of apps I add:
 9. hdparm - controls for HDDs
 
 
-### Post-Install Items
+### HDD spin-down rules
 
 On my old laptop there is a spinning-disc HDD.  I had an issue with it running constantly and never suspending.  I had to do the following:
 (/dev/sda is my HDD, /dev/nvme0n1 is my nvme)
 Allow suspending...Set suspending the HDD to 5 minutes.  The number in the hdparm command is a calculation of 5-second intervals. [minutes]*60/5.  So, 5-minutes is 5*60/5=60. 10-minutes would be 10*60/5=120.
+
+udevd doesn't seem to work directly after boot, and it definitely doesn't work after waking from sleep. Retiring this method...
+>  ```
+>  # this part is just temporary though...
+>  sudo hdparm --yes-i-know-what-i-am-doing -s 1 /dev/sda
+>  sudo hdparm -S 60 /dev/sda
+>  
+>  # this is the permanent fix...
+>  sudo udevadm info -q all -n /dev/sda | grep ID_SERIAL
+>  sudo nvim /etc/udev/rules.d/99-spindown.rules
+>  
+>  # Add the following line in your new .rules file...change my serial number for yours.
+>  ACTION=="add|change", SUBSYSTEM=="block", ENV{ID_SERIAL}=="WDC_WD10JPVX-22JC3T0_WD-WX61C54F1234", RUN+="/usr/bin/hdparm -S 36 /dev/%k"
+>  
+>  sudo udevadm control --reload-rules
+>  sudo udevadm trigger
+>  
+>  sudo hdparm -C /dev/sda
+>  ```
+
+Adding active services to control this at boot and waking from sleep:
 ```
-# this part is just temporary though...
-sudo hdparm --yes-i-know-what-i-am-doing -s 1 /dev/sda
-sudo hdparm -S 60 /dev/sda
-
-# this is the permanent fix...
-sudo udevadm info -q all -n /dev/sda | grep ID_SERIAL
-sudo nvim /etc/udev/rules.d/99-spindown.rules
-
-# Add the following line in your new .rules file...change my serial number for yours.
-ACTION=="add|change", SUBSYSTEM=="block", ENV{ID_SERIAL}=="WDC_WD10JPVX-22JC3T0_WD-WX61C54F1234", RUN+="/usr/bin/hdparm -S 36 /dev/%k"
-
-sudo udevadm control --reload-rules
-sudo udevadm trigger
-
-sudo hdparm -C /dev/sda
+sudo nvim /etc/systemd/system/hdd-spin-down.service
 ```
+Add this to the file:
+```
+[Unit]
+Description=Spin down HDD
+After=dev-sdX.device  # Replace sdX with your HDD identifier
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'sleep 5; /usr/bin/hdparm -S 12 /dev/disk/by-id/ata-ST2000LM007-1R8174_WDZ7XHYY'
+
+[Install]
+WantedBy=multi-user.target
+
+```
+Start the service:
+```
+sudo systemctl enable --now hdd-spin-down.service
+```
+
+
+```
+sudo nvim /etc/systemd/system/hdd-spin-down-on-wake.service
+```
+Add this to the file:
+```
+[Unit]
+Description=Spin down HDD on wake
+After=suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hdparm -S 12 /dev/disk/by-id/ata-ST2000LM007-1R8174_WDZ7XHYY
+
+[Install]
+WantedBy=suspend.target
+
+```
+Start the service:
+```
+sudo systemctl enable --now hdd-spin-down-on-wake.service
+```
+
+
+### Post-Install Items
 
 Enable the uncomplicated firewall:
 ```
 sudo systemctl enable --now ufw.service
 ```
 
-Add Oh-My-Posh to pretty up the terminal prompt:<br>
-[https://ohmyposh.dev/docs/installation/linux](https://ohmyposh.dev/docs/installation/linux)
-Install oh-my-posh...
+Install 'fd' (better find) and ripgrep 'rg' (better grep):
 ```
-curl -s https://ohmyposh.dev/install.sh | bash -s
+sudo pacman -S fd ripgrep
 ```
-Edit the .bashrc file 
-```
-nvim .bashrc
-```
-Hit 'i' to insert. Add this line at the very end of the file...I'm using the 'catppuccin' theme.
-```
-eval "$(oh-my-posh init bash --config /home/evan/.cache/oh-my-posh/themes/catppuccin.omp.json)"
-```
-Hit escape, ':' for a command, then 'wq' to write/quit. Then refresh bash...
-```
-source .bashrc
-```
+
+
+Putting this part on hold, as Omarchy 2.0 added some bash styling...
+
+>  Add Oh-My-Posh to pretty up the terminal prompt:<br>
+>  [https://ohmyposh.dev/docs/installation/linux](https://ohmyposh.dev/docs/installation/linux)
+>  Install oh-my-posh...
+>  ```
+>  curl -s https://ohmyposh.dev/install.sh | bash -s
+>  ```
+>  Edit the .bashrc file 
+>  ```
+>  nvim .bashrc
+>  ```
+>  Hit 'i' to insert. Add this line at the very end of the file...I'm using the 'catppuccin' theme.
+>  ```
+>  eval "$(oh-my-posh init bash --config /home/evan/.cache/oh-my-posh/themes/catppuccin.omp.json)"
+>  ```
+>  Hit escape, ':' for a command, then 'wq' to write/quit. Then refresh bash...
+>  ```
+>  source .bashrc
+>  ```
 
 
 ### Other stuff
